@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Model = Service.WebApi.Models.Post;
+using Model = Service.WebApi.Models.ProductCategory;
 
 namespace Service.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PostController : GenericController<Model>
+    public class ProductCategoryController : GenericController<Model>
     {
     }
 }

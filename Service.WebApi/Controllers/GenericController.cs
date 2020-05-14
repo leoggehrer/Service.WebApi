@@ -11,6 +11,50 @@ namespace Service.WebApi.Controllers
     public class GenericController<T> : ControllerBase
         where T : Models.ModelObject, new()
     {
+        // GET: api/Post
+        [HttpGet]
+        public IEnumerable<T> Get()
+        {
+            return LoadData();
+        }
+
+        // GET: api/Post/5
+        [HttpGet("{id}")]
+        public T Get(int id)
+        {
+            var models = LoadData();
+
+            return models.SingleOrDefault(m => m.Id == id);
+        }
+
+        // POST: api/Post
+        [HttpPost]
+        public T Post([FromBody]T model)
+        {
+            return InsertModel(model);
+        }
+
+        // PUT: api/Post/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] T model)
+        {
+            UpdateModel(id, model);
+        }
+
+        // PATCH: api/Post/5
+        [HttpPatch("{id}")]
+        public void Patch(int id, [FromBody] T model)
+        {
+            UpdateModel(id, model);
+        }
+
+        // DELETE: api/ApiWithActions/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+            DeleteModel(id);
+        }
+
         protected enum SerializerType
         {
             Binary,

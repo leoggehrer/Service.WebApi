@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Model = Service.WebApi.Models.Product;
 
 namespace Service.WebApi.Controllers
@@ -9,54 +7,5 @@ namespace Service.WebApi.Controllers
     [ApiController]
     public class ProductController : GenericController<Model>
     {
-        [HttpGet("metadata")]
-        public string GetMeta()
-        {
-            return GetModelMetaData();
-        }
-
-        // GET: api/Post
-        [HttpGet]
-        public IEnumerable<Model> Get()
-        {
-            return LoadData();
-        }
-
-        // GET: api/Post/5
-        [HttpGet("{id}")]
-        public Model Get(int id)
-        {
-            var models = LoadData();
-
-            return models.SingleOrDefault(m => m.Id == id);
-        }
-
-        // POST: api/Post
-        [HttpPost]
-        public Model Post([FromBody]Model model)
-        {
-            return InsertModel(model);
-        }
-
-        // PUT: api/Post/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Model model)
-        {
-            UpdateModel(id, model);
-        }
-
-        // PATCH: api/Post/5
-        [HttpPatch("{id}")]
-        public void Patch(int id, [FromBody] Model model)
-        {
-            UpdateModel(id, model);
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-            DeleteModel(id);
-        }
     }
 }
