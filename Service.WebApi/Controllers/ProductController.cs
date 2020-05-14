@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Model = Service.WebApi.Models.Post;
+using Model = Service.WebApi.Models.Product;
 
 namespace Service.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PostController : GenericController<Model>
+    public class ProductController : GenericController<Model>
     {
         [HttpGet("metadata")]
         public string GetMeta()

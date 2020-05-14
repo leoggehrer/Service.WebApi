@@ -4,35 +4,50 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 
 namespace Service.WebApi.Controllers
 {
     public class GenericController<T> : ControllerBase
         where T : Models.ModelObject, new()
     {
+        protected enum SerializerType
+        {
+            Binary,
+            Json,
+        }
+
+        protected SerializerType Serializer { get; set; } = SerializerType.Json;
         private string DataFolder => "Data";
-        private string FileName => $"{typeof(T).Name}.ser";
+        private string FileName => $"{typeof(T).Name}";
 
         protected string GetModelMetaData()
         {
+            var counter = 0;
             var result = "{";
             var model = new T();
 
             foreach (var pi in model.GetType().GetProperties())
             {
-                result += Environment.NewLine;
-                result += $"  \"{pi.Name}\": {pi.PropertyType}"; 
+                result += counter++ > 0 ? "," + Environment.NewLine
+                                        : Environment.NewLine;
+                result += $"  \"{pi.Name}\": {pi.PropertyType}";
             }
 
-            result += Environment.NewLine +  "}";
+            result += Environment.NewLine + "}";
             return result;
         }
 
+        protected JsonSerializerOptions DeserializerOptions => new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         protected IEnumerable<T> LoadData()
         {
-            var result = default(List<T>);
+            var result = default(IEnumerable<T>);
             var path = Path.Combine(Directory.GetCurrentDirectory(), DataFolder);
-            var filePath = Path.Combine(path, FileName);
+            var filePath = Path.Combine(path, $"{FileName}.{Serializer.ToString().ToLower()}");
 
             if (Directory.Exists(path) == false)
             {
@@ -40,11 +55,18 @@ namespace Service.WebApi.Controllers
             }
             else if (System.IO.File.Exists(filePath))
             {
-                var formatter = new BinaryFormatter();
-                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                if (Serializer == SerializerType.Binary)
+                {
+                    var formatter = new BinaryFormatter();
+                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
-                result = (List<T>)formatter.Deserialize(fs);
-                fs.Close();
+                    result = (List<T>)formatter.Deserialize(fs);
+                    fs.Close();
+                }
+                else
+                {
+                    result = JsonSerializer.Deserialize<IEnumerable<T>>(System.IO.File.ReadAllText(filePath), DeserializerOptions);
+                }
             }
             else
             {
@@ -55,17 +77,24 @@ namespace Service.WebApi.Controllers
         protected void SaveData(IEnumerable<T> models)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), DataFolder);
-            var filePath = Path.Combine(path, FileName);
+            var filePath = Path.Combine(path, $"{FileName}.{Serializer.ToString().ToLower()}");
 
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
-            var formatter = new BinaryFormatter();
-            using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            if (Serializer == SerializerType.Binary)
+            {
+                var formatter = new BinaryFormatter();
+                using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 
-            formatter.Serialize(fs, models.ToList());
-            fs.Close();
+                formatter.Serialize(fs, models.ToList());
+                fs.Close();
+            }
+            else
+            {
+                System.IO.File.WriteAllText(filePath, JsonSerializer.Serialize<IEnumerable<T>>(models));
+            }
         }
 
         protected T InsertModel(T model)
