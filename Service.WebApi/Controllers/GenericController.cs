@@ -12,6 +12,13 @@ namespace Service.WebApi.Controllers
         where T : Models.ModelObject, new()
     {
         // GET: api/Post
+        [HttpGet("metadata")]
+        public string GetMetadata()
+        {
+            return GetModelMetaData();
+        }
+
+        // GET: api/Post
         [HttpGet]
         public IEnumerable<T> Get()
         {
