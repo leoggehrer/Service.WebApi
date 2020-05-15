@@ -15,7 +15,7 @@ namespace Service.WebApi.Controllers
         [HttpGet("metadata")]
         public string GetMetadata()
         {
-            return GetModelMetaData();
+            return GetModelMetadata();
         }
 
         // GET: api/Post
@@ -72,7 +72,7 @@ namespace Service.WebApi.Controllers
         private string DataFolder => "Data";
         private string FileName => $"{typeof(T).Name}";
 
-        protected string GetModelMetaData()
+        protected string GetModelMetadata()
         {
             var counter = 0;
             var result = "{";
